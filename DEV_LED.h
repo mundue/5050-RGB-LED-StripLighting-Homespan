@@ -1,3 +1,4 @@
+extern const uint8_t gamma8[];
 
 ////////////////////////////////////
 //   DEVICE-SPECIFIC LED SERVICES //
@@ -14,9 +15,9 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Command Cathode)
   
   DEV_RgbLED(int red_pin, int green_pin, int blue_pin) : Service::LightBulb(){       // constructor() method
 
-    power=new Characteristic::On();                    
-    H=new Characteristic::Hue(0);              // instantiate the Hue Characteristic with an initial value of 0 out of 360
-    S=new Characteristic::Saturation(0);       // instantiate the Saturation Characteristic with an initial value of 0%
+    power=new Characteristic::On();
+    H=new Characteristic::Hue(14);             // instantiate the Hue Characteristic with an initial value of 0 out of 360
+    S=new Characteristic::Saturation(73);      // instantiate the Saturation Characteristic with an initial value of 0%
     V=new Characteristic::Brightness(100);     // instantiate the Brightness Characteristic with an initial value of 100%
     V->setRange(5,100,1);                      // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
     
@@ -84,9 +85,15 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Command Cathode)
 
     int R, G, B;
 
-    R=p*r*100;                                      // since LedPin uses percent, scale back up by 100, and multiple by status fo power (either 0 or 1)
-    G=p*g*100;
-    B=p*b*100;
+    // R=p*r*100;                                      // since LedPin uses percent, scale back up by 100, and multiple by status fo power (either 0 or 1)
+    // G=p*g*100;
+    // B=p*b*100;
+    int red=p*r*255;                                  // Scale r,g,b values to 0-255 for gamma correction
+    int green=p*g*255;
+    int blue=p*b*255;
+    R=map(pgm_read_byte(&gamma8[red]), 0, 255, 0, 100);   // Remap corrected values to 0-100 for LedPin                                   
+    G=map(pgm_read_byte(&gamma8[green]), 0, 255, 0, 100);
+    B=map(pgm_read_byte(&gamma8[blue]), 0, 255, 0, 100);
 
     sprintf(cBuf,"RGB=(%d,%d,%d)\n",R,G,B);
     LOG1(cBuf);
@@ -101,3 +108,23 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Command Cathode)
 };
       
 //////////////////////////////////
+
+// Gamma table from https://learn.adafruit.com/led-tricks-gamma-correction/the-quick-fix
+const uint8_t PROGMEM gamma8[] = {
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
+  1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
+  2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
+  5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+  10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
+  17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
+  25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
+  37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,
+  51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,
+  69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,
+  90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 107, 109, 110, 112, 114,
+  115, 117, 119, 120, 122, 124, 126, 127, 129, 131, 133, 135, 137, 138, 140, 142,
+  144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 167, 169, 171, 173, 175,
+  177, 180, 182, 184, 186, 189, 191, 193, 196, 198, 200, 203, 205, 208, 210, 213,
+  215, 218, 220, 223, 225, 228, 231, 233, 236, 239, 241, 244, 247, 249, 252, 255
+};
