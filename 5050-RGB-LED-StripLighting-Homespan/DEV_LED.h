@@ -4,7 +4,7 @@ extern const uint8_t gamma8[];
 //   DEVICE-SPECIFIC LED SERVICES //
 ////////////////////////////////////
 
-struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Command Cathode)
+struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
 
   LedPin *redPin, *greenPin, *bluePin;
   
