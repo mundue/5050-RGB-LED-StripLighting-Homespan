@@ -38,9 +38,9 @@
 #include "HomeSpan.h" 
 #include "DEV_LED.h"     
 
-const int REDPIN = 25;
-const int BLUEPIN = 27;
-const int GREENPIN = 4;
+const int REDPIN = 35;
+const int GREENPIN = 36;
+const int BLUEPIN = 37;
 
 void setup() {
 
@@ -62,7 +62,7 @@ void setup() {
     new Service::AccessoryInformation();    
       new Characteristic::Identify();               
       new Characteristic::Name("RGB LED"); 
-    new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);           // Create an RGB LED attached to pins 25,4,27 (for R, G, and B LED anodes)
+    new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);           // Create an RGB LED attached to pins 35,36,37 (for R, G, and B LED anodes)
       
 } // end of setup()
 
