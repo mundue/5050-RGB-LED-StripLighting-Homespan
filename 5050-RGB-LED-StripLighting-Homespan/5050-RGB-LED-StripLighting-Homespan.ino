@@ -41,6 +41,8 @@
 const int REDPIN = 35;
 const int GREENPIN = 36;
 const int BLUEPIN = 37;
+const int STATUSPIN = 2;
+const int CONTROLPIN = 47;
 
 void setup() {
 
@@ -51,7 +53,11 @@ void setup() {
   // in prior examples.
   
   Serial.begin(115200);
-
+  homeSpan.setSketchVersion("0.0.1");
+  homeSpan.enableOTA();
+  homeSpan.setStatusPin(STATUSPIN); // Builtin simple LED
+  // homeSpan.setStatusPixel(48); // Builtin RGB LED
+  homeSpan.setControlPin(CONTROLPIN);
   homeSpan.begin(Category::Bridges,"HomeSpan LED Bridge");
 
   new SpanAccessory();  
