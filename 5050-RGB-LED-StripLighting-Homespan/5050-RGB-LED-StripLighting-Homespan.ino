@@ -38,9 +38,9 @@
 #include "HomeSpan.h" 
 #include "DEV_LED.h"     
 
-const int REDPIN = 35;
-const int GREENPIN = 36;
-const int BLUEPIN = 37;
+const int REDPIN = 20;
+const int GREENPIN = 21;
+const int BLUEPIN = 22;
 const int STATUSPIN = 2;
 const int CONTROLPIN = 47;
 
@@ -55,9 +55,6 @@ void setup() {
   Serial.begin(115200);
   homeSpan.setSketchVersion("0.0.1");
   homeSpan.enableOTA();
-  homeSpan.setStatusPin(STATUSPIN); // Builtin simple LED
-  // homeSpan.setStatusPixel(48); // Builtin RGB LED
-  homeSpan.setControlPin(CONTROLPIN);
   homeSpan.begin(Category::Bridges,"HomeSpan LED Bridge");
 
   new SpanAccessory();  
@@ -67,8 +64,8 @@ void setup() {
   new SpanAccessory();                                                          
     new Service::AccessoryInformation();    
       new Characteristic::Identify();               
-      new Characteristic::Name("RGB LED"); 
-    new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);           // Create an RGB LED attached to pins 35,36,37 (for R, G, and B LED anodes)
+      new Characteristic::Name("RGB LED Strip"); 
+    new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);           // Create an RGB LED attached to pins 20,21,22 (for R, G, and B LED anodes)
       
 } // end of setup()
 
