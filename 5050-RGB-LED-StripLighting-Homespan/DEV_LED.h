@@ -6,7 +6,7 @@ extern const uint8_t gamma8[];
 
 struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
 
-  LedPin *redPin, *greenPin, *bluePin;
+  LedPin *redLED, *greenLED, *blueLED;
   
   SpanCharacteristic *power;                   // reference to the On Characteristic
   SpanCharacteristic *H;                       // reference to the Hue Characteristic
@@ -15,18 +15,19 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
   
   DEV_RgbLED(int red_pin, int green_pin, int blue_pin) : Service::LightBulb(){       // constructor() method
 
-    power=new Characteristic::On();
+    // TBD save and restore values to NVS, see example 18-SavingStatus.ino
+    power=new Characteristic::On(0);
     H=new Characteristic::Hue(14);             // instantiate the Hue Characteristic with an initial value of 0 out of 360
     S=new Characteristic::Saturation(73);      // instantiate the Saturation Characteristic with an initial value of 0%
     V=new Characteristic::Brightness(100);     // instantiate the Brightness Characteristic with an initial value of 100%
     V->setRange(5,100,1);                      // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
     
-    this->redPin=new LedPin(red_pin);        // configures a PWM LED for output to the RED pin
-    this->greenPin=new LedPin(green_pin);    // configures a PWM LED for output to the GREEN pin
-    this->bluePin=new LedPin(blue_pin);      // configures a PWM LED for output to the BLUE pin
+    this->redLED=new LedPin(red_pin);        // configures a PWM LED for output to the RED pin
+    this->greenLED=new LedPin(green_pin);    // configures a PWM LED for output to the GREEN pin
+    this->blueLED=new LedPin(blue_pin);      // configures a PWM LED for output to the BLUE pin
  
     char cBuf[128];
-    sprintf(cBuf,"Configuring RGB LED: Pins=(%d,%d,%d)\n",redPin->getPin(),greenPin->getPin(),bluePin->getPin());
+    sprintf(cBuf,"Configuring RGB LED: Pins=(%d,%d,%d)\n",redLED->getPin(),greenLED->getPin(),blueLED->getPin());
     Serial.print(cBuf);
     
   } // end constructor
@@ -42,7 +43,7 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
     p=power->getVal();
 
     char cBuf[128];
-    sprintf(cBuf,"Updating RGB LED: Pins=(%d,%d,%d): ",redPin->getPin(),greenPin->getPin(),bluePin->getPin());
+    sprintf(cBuf,"Updating RGB LED: Pins=(%d,%d,%d): ",redLED->getPin(),greenLED->getPin(),blueLED->getPin());
     LOG1(cBuf);
 
     if(power->updated()){
@@ -98,9 +99,9 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
     sprintf(cBuf,"RGB=(%d,%d,%d)\n",R,G,B);
     LOG1(cBuf);
 
-    redPin->set(R);                      // update each ledPin with new values
-    greenPin->set(G);    
-    bluePin->set(B);    
+    redLED->set(R);                      // update each ledPin with new values
+    greenLED->set(G);    
+    blueLED->set(B);    
       
     return(true);                               // return true
   
