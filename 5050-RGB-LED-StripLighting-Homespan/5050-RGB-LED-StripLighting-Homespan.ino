@@ -36,6 +36,7 @@
 ////////////////////////////////////////////////////////////
 
 // See also https://johnmu.com/controlling-5050-led-strip-with-esp32 for wiring inspiration.
+// See also https://help.sinric.pro/pages/tutorials/light/LED-Stripe-5050 for wiring inspiration.
 
 #include "HomeSpan.h" 
 #include "DEV_LED.h"     
