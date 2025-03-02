@@ -41,11 +41,11 @@
 #include "HomeSpan.h" 
 #include "DEV_LED.h"     
 
+const int GREENPIN = 19;
 const int REDPIN = 20;
-const int GREENPIN = 21;
-const int BLUEPIN = 22;
-const int STATUSPIN = 8;
-const int CONTROLPIN = 19;
+const int BLUEPIN = 21;
+const int STATUSPIN = 8;  // Builtin RGB LED
+const int CONTROLPIN = 0; // BOOT Button
 
 void setup() {
 
