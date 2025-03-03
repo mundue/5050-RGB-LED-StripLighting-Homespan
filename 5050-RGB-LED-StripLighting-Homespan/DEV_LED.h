@@ -17,8 +17,9 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
 
     // TBD save and restore values to NVS, see example 18-SavingStatus.ino
     power=new Characteristic::On(0);
-    H=new Characteristic::Hue(14);             // instantiate the Hue Characteristic with an initial value of 0 out of 360
-    S=new Characteristic::Saturation(73);      // instantiate the Saturation Characteristic with an initial value of 0%
+    // Set H,S,V to desired ("orange") color as default, matches my other HomeKit lights. Can be changed in Home app.
+    H=new Characteristic::Hue(14);             // instantiate the Hue Characteristic with an initial value of 14 out of 360
+    S=new Characteristic::Saturation(73);      // instantiate the Saturation Characteristic with an initial value of 73%
     V=new Characteristic::Brightness(100);     // instantiate the Brightness Characteristic with an initial value of 100%
     V->setRange(5,100,1);                      // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
     

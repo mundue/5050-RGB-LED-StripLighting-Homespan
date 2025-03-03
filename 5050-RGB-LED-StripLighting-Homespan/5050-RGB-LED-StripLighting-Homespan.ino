@@ -45,7 +45,7 @@ const int GREENPIN = 19;
 const int REDPIN = 20;
 const int BLUEPIN = 21;
 const int STATUSPIN = 8;  // Builtin RGB LED
-const int CONTROLPIN = 0; // BOOT Button
+const int CONTROLPIN = 9; // BOOT Button on ESP32-C6
 
 void setup() {
 
@@ -56,7 +56,7 @@ void setup() {
   // in prior examples.
   
   Serial.begin(115200);
-  homeSpan.setSketchVersion("0.0.1");
+  homeSpan.setSketchVersion("1.0.0");
   homeSpan.enableOTA();
   homeSpan.setStatusPixel(STATUSPIN);
   homeSpan.setControlPin(CONTROLPIN);
