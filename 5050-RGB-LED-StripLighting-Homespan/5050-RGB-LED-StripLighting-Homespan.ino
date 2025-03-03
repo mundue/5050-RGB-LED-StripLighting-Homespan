@@ -56,11 +56,13 @@ void setup() {
   // in prior examples.
   
   Serial.begin(115200);
-  homeSpan.setSketchVersion("1.0.0");
+  homeSpan.setSketchVersion("1.0.1");
   homeSpan.enableOTA();
   homeSpan.setStatusPixel(STATUSPIN);
   homeSpan.setControlPin(CONTROLPIN);
   homeSpan.begin(Category::Bridges,"HomeSpan LED Bridge");
+  // homeSpan.setLogLevel(1);
+  // Serial.printf("Log Level: %d\n", homeSpan.getLogLevel());
 
   new SpanAccessory();  
     new Service::AccessoryInformation();

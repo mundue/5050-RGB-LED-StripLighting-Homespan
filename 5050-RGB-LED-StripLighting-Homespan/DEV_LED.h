@@ -16,12 +16,11 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
   DEV_RgbLED(int red_pin, int green_pin, int blue_pin) : Service::LightBulb(){       // constructor() method
 
     // TBD save and restore values to NVS, see example 18-SavingStatus.ino
-    power=new Characteristic::On(0);
-    // Set H,S,V to desired ("orange") color as default, matches my other HomeKit lights. Can be changed in Home app.
-    H=new Characteristic::Hue(14);             // instantiate the Hue Characteristic with an initial value of 14 out of 360
-    S=new Characteristic::Saturation(73);      // instantiate the Saturation Characteristic with an initial value of 73%
-    V=new Characteristic::Brightness(100);     // instantiate the Brightness Characteristic with an initial value of 100%
-    V->setRange(5,100,1);                      // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
+    power=new Characteristic::On(0, true);          // instantiate the On Characteristic, second arguments (true) are to allow saving/restoring from NVS
+    H=new Characteristic::Hue(0, true);             // instantiate the Hue Characteristic with an initial value of 0 out of 360
+    S=new Characteristic::Saturation(0, true);      // instantiate the Saturation Characteristic with an initial value of 0%
+    V=new Characteristic::Brightness(100, true);    // instantiate the Brightness Characteristic with an initial value of 100%
+    V->setRange(5,100,1);                           // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
     
     this->redLED=new LedPin(red_pin);        // configures a PWM LED for output to the RED pin
     this->greenLED=new LedPin(green_pin);    // configures a PWM LED for output to the GREEN pin
@@ -30,6 +29,8 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
     char cBuf[128];
     sprintf(cBuf,"Configuring RGB LED: Pins=(%d,%d,%d)\n",redLED->getPin(),greenLED->getPin(),blueLED->getPin());
     Serial.print(cBuf);
+
+    update();  // Call this once at startup to force the rather complicated RGB value computations from (potentially) restored values.
     
   } // end constructor
 
