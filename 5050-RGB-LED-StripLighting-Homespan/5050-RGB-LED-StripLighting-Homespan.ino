@@ -58,9 +58,9 @@ void setup() {
   Serial.begin(115200);
   homeSpan.setSketchVersion("1.0.1");
   homeSpan.enableOTA();
-  homeSpan.setStatusPixel(STATUSPIN);
-  homeSpan.setControlPin(CONTROLPIN);
-  homeSpan.begin(Category::Bridges,"HomeSpan LED Bridge");
+  // homeSpan.setStatusPixel(STATUSPIN);
+  // homeSpan.setControlPin(CONTROLPIN);
+  homeSpan.begin(Category::Bridges,"HomeSpan LED Bridge 1");
   // homeSpan.setLogLevel(1);
   // Serial.printf("Log Level: %d\n", homeSpan.getLogLevel());
 
