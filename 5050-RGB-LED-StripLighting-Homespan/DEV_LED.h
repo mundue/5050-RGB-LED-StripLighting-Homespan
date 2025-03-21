@@ -1,82 +1,85 @@
+#include "HomeSpan.h"
+
 extern const uint8_t gamma8[];
 
 ////////////////////////////////////
 //   DEVICE-SPECIFIC LED SERVICES //
 ////////////////////////////////////
 
-struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
+struct DEV_RgbLED : Service::LightBulb {  // RGB LED (Common Cathode)
 
   LedPin *redLED, *greenLED, *blueLED;
-  
-  SpanCharacteristic *power;                   // reference to the On Characteristic
-  SpanCharacteristic *H;                       // reference to the Hue Characteristic
-  SpanCharacteristic *S;                       // reference to the Saturation Characteristic
-  SpanCharacteristic *V;                       // reference to the Brightness Characteristic
-  
-  DEV_RgbLED(int red_pin, int green_pin, int blue_pin) : Service::LightBulb(){       // constructor() method
+
+  SpanCharacteristic *power;  // reference to the On Characteristic
+  SpanCharacteristic *H;      // reference to the Hue Characteristic
+  SpanCharacteristic *S;      // reference to the Saturation Characteristic
+  SpanCharacteristic *V;      // reference to the Brightness Characteristic
+
+  DEV_RgbLED(int red_pin, int green_pin, int blue_pin)
+    : Service::LightBulb() {  // constructor() method
 
     // TBD save and restore values to NVS, see example 18-SavingStatus.ino
-    power=new Characteristic::On(0, true);          // instantiate the On Characteristic, second arguments (true) are to allow saving/restoring from NVS
-    H=new Characteristic::Hue(0, true);             // instantiate the Hue Characteristic with an initial value of 0 out of 360
-    S=new Characteristic::Saturation(0, true);      // instantiate the Saturation Characteristic with an initial value of 0%
-    V=new Characteristic::Brightness(100, true);    // instantiate the Brightness Characteristic with an initial value of 100%
-    V->setRange(5,100,1);                           // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
-    
-    this->redLED=new LedPin(red_pin);        // configures a PWM LED for output to the RED pin
-    this->greenLED=new LedPin(green_pin);    // configures a PWM LED for output to the GREEN pin
-    this->blueLED=new LedPin(blue_pin);      // configures a PWM LED for output to the BLUE pin
- 
+    power = new Characteristic::On(0, true);        // instantiate the On Characteristic, second arguments (true) are to allow saving/restoring from NVS
+    H = new Characteristic::Hue(0, true);           // instantiate the Hue Characteristic with an initial value of 0 out of 360
+    S = new Characteristic::Saturation(0, true);    // instantiate the Saturation Characteristic with an initial value of 0%
+    V = new Characteristic::Brightness(100, true);  // instantiate the Brightness Characteristic with an initial value of 100%
+    V->setRange(5, 100, 1);                         // sets the range of the Brightness to be from a min of 5%, to a max of 100%, in steps of 1%
+
+    this->redLED = new LedPin(red_pin);      // configures a PWM LED for output to the RED pin
+    this->greenLED = new LedPin(green_pin);  // configures a PWM LED for output to the GREEN pin
+    this->blueLED = new LedPin(blue_pin);    // configures a PWM LED for output to the BLUE pin
+
     char cBuf[128];
-    sprintf(cBuf,"Configuring RGB LED: Pins=(%d,%d,%d)\n",redLED->getPin(),greenLED->getPin(),blueLED->getPin());
+    sprintf(cBuf, "Configuring RGB LED: Pins=(%d,%d,%d)\n", redLED->getPin(), greenLED->getPin(), blueLED->getPin());
     Serial.print(cBuf);
 
     update();  // Call this once at startup to force the rather complicated RGB value computations from (potentially) restored values.
-    
-  } // end constructor
 
-  boolean update(){                         // update() method
+  }  // end constructor
+
+  boolean update() {  // update() method
 
     boolean p;
     float v, h, s, r, g, b;
 
-    h=H->getVal<float>();                      // get and store all current values.  Note the use of the <float> template to properly read the values
-    s=S->getVal<float>();
-    v=V->getVal<float>();                      // though H and S are defined as FLOAT in HAP, V (which is brightness) is defined as INT, but will be re-cast appropriately
-    p=power->getVal();
+    h = H->getVal<float>();  // get and store all current values.  Note the use of the <float> template to properly read the values
+    s = S->getVal<float>();
+    v = V->getVal<float>();  // though H and S are defined as FLOAT in HAP, V (which is brightness) is defined as INT, but will be re-cast appropriately
+    p = power->getVal();
 
     char cBuf[128];
-    sprintf(cBuf,"Updating RGB LED: Pins=(%d,%d,%d): ",redLED->getPin(),greenLED->getPin(),blueLED->getPin());
+    sprintf(cBuf, "Updating RGB LED: Pins=(%d,%d,%d): ", redLED->getPin(), greenLED->getPin(), blueLED->getPin());
     LOG1(cBuf);
 
-    if(power->updated()){
-      p=power->getNewVal();
-      sprintf(cBuf,"Power=%s->%s, ",power->getVal()?"true":"false",p?"true":"false");
+    if (power->updated()) {
+      p = power->getNewVal();
+      sprintf(cBuf, "Power=%s->%s, ", power->getVal() ? "true" : "false", p ? "true" : "false");
     } else {
-      sprintf(cBuf,"Power=%s, ",p?"true":"false");
-    }
-    LOG1(cBuf);
-      
-    if(H->updated()){
-      h=H->getNewVal<float>();
-      sprintf(cBuf,"H=%.0f->%.0f, ",H->getVal<float>(),h);
-    } else {
-      sprintf(cBuf,"H=%.0f, ",h);
+      sprintf(cBuf, "Power=%s, ", p ? "true" : "false");
     }
     LOG1(cBuf);
 
-    if(S->updated()){
-      s=S->getNewVal<float>();
-      sprintf(cBuf,"S=%.0f->%.0f, ",S->getVal<float>(),s);
+    if (H->updated()) {
+      h = H->getNewVal<float>();
+      sprintf(cBuf, "H=%.0f->%.0f, ", H->getVal<float>(), h);
     } else {
-      sprintf(cBuf,"S=%.0f, ",s);
+      sprintf(cBuf, "H=%.0f, ", h);
     }
     LOG1(cBuf);
 
-    if(V->updated()){
-      v=V->getNewVal<float>();
-      sprintf(cBuf,"V=%.0f->%.0f  ",V->getVal<float>(),v);
+    if (S->updated()) {
+      s = S->getNewVal<float>();
+      sprintf(cBuf, "S=%.0f->%.0f, ", S->getVal<float>(), s);
     } else {
-      sprintf(cBuf,"V=%.0f  ",v);
+      sprintf(cBuf, "S=%.0f, ", s);
+    }
+    LOG1(cBuf);
+
+    if (V->updated()) {
+      v = V->getNewVal<float>();
+      sprintf(cBuf, "V=%.0f->%.0f  ", V->getVal<float>(), v);
+    } else {
+      sprintf(cBuf, "V=%.0f  ", v);
     }
     LOG1(cBuf);
 
@@ -84,41 +87,41 @@ struct DEV_RgbLED : Service::LightBulb {       // RGB LED (Common Cathode)
     // Parameters must all be floats in range of H[0,360], S[0,1], and V[0,1]
     // R, G, B, returned [0,1] range as well
 
-    LedPin::HSVtoRGB(h,s/100.0,v/100.0,&r,&g,&b);   // since HomeKit provides S and V in percent, scale down by 100
+    LedPin::HSVtoRGB(h, s / 100.0, v / 100.0, &r, &g, &b);  // since HomeKit provides S and V in percent, scale down by 100
 
     int R, G, B;
 
     // R=p*r*100;                                      // since LedPin uses percent, scale back up by 100, and multiple by status fo power (either 0 or 1)
     // G=p*g*100;
     // B=p*b*100;
-    int red=p*r*255;                                  // Scale r,g,b values to 0-255 for gamma correction
-    int green=p*g*255;
-    int blue=p*b*255;
-    R=map(pgm_read_byte(&gamma8[red]), 0, 255, 0, 100);   // Remap corrected values to 0-100 for LedPin                                   
-    G=map(pgm_read_byte(&gamma8[green]), 0, 255, 0, 100);
-    B=map(pgm_read_byte(&gamma8[blue]), 0, 255, 0, 100);
+    int red = p * r * 255;  // Scale r,g,b values to 0-255 for gamma correction
+    int green = p * g * 255;
+    int blue = p * b * 255;
+    R = map(pgm_read_byte(&gamma8[red]), 0, 255, 0, 100);  // Remap corrected values to 0-100 for LedPin
+    G = map(pgm_read_byte(&gamma8[green]), 0, 255, 0, 100);
+    B = map(pgm_read_byte(&gamma8[blue]), 0, 255, 0, 100);
 
-    sprintf(cBuf,"RGB=(%d,%d,%d)\n",R,G,B);
+    sprintf(cBuf, "RGB=(%d,%d,%d)\n", R, G, B);
     LOG1(cBuf);
 
-    redLED->set(R);                      // update each ledPin with new values
-    greenLED->set(G);    
-    blueLED->set(B);    
-      
-    return(true);                               // return true
-  
-  } // update
+    redLED->set(R);  // update each ledPin with new values
+    greenLED->set(G);
+    blueLED->set(B);
+
+    return (true);  // return true
+
+  }  // update
 };
-      
+
 //////////////////////////////////
 
 // Gamma table from https://learn.adafruit.com/led-tricks-gamma-correction/the-quick-fix
 const uint8_t PROGMEM gamma8[] = {
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
-  1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
-  2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,
-  5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2,
+  2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5,
+  5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 10,
   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,
   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,
   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,
