@@ -60,19 +60,15 @@ void setup() {
   homeSpan.enableOTA();
   // homeSpan.setStatusPixel(STATUSPIN);
   // homeSpan.setControlPin(CONTROLPIN);
-  homeSpan.begin(Category::Bridges, "HomeSpan LED Bridge 1");
+  homeSpan.begin(Category::Lighting, "HomeSpan Light Strip");
   // homeSpan.setLogLevel(1);
   // Serial.printf("Log Level: %d\n", homeSpan.getLogLevel());
 
   new SpanAccessory();
-  new Service::AccessoryInformation();
-  new Characteristic::Identify();
-
-  new SpanAccessory();
-  new Service::AccessoryInformation();
-  new Characteristic::Identify();
-  new Characteristic::Name("RGB LED Strip");
-  new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);  // Create an RGB LED attached to pins 20,21,22 (for R, G, and B LED anodes)
+    new Service::AccessoryInformation();
+      new Characteristic::Identify();
+      new Characteristic::Name("Light Strip");
+    new DEV_RgbLED(REDPIN, GREENPIN, BLUEPIN);  // Create an RGB LED attached to pins 20,21,22 (for R, G, and B LED anodes)
 
 }  // end of setup()
 
